@@ -1,0 +1,94 @@
+{% extends "gyara/base.html" %}
+
+{% block title %}
+    Gyara - All Transactions
+{% endblock %}
+
+{% block extrascript %}
+    <script>
+        $(document).ready(function () {
+            $('.ui.sticky').sticky({context: '#test'});
+        });
+
+    </script>
+{% endblock %}
+
+{% block nav-all-month %}<a class="item active" href="{% url 'gyara:all-month' %}">View-All</a>{% endblock %}
+
+{% block content %}
+    <div class="ui basic segment" id="test">
+        <div class="ui right  attached rail">
+            <div class="ui segment basic sticky">
+                <div class="ui selection vertical menu">
+                    <div class="item active">
+                        <h4 class="ui header">Month</h4>
+                    </div>
+                    <a class="item" href="{% url 'gyara:all-month' 1 %}">January</a>
+                    <a class="item" href="{% url 'gyara:all-month' 2 %}">February</a>
+                    <a class="item" href="{% url 'gyara:all-month' 3 %}">March</a>
+                    <a class="item" href="{% url 'gyara:all-month' 4 %}">April</a>
+                    <a class="item" href="{% url 'gyara:all-month' 5 %}">May</a>
+                    <a class="item" href="{% url 'gyara:all-month' 6 %}">June</a>
+                    <a class="item" href="{% url 'gyara:all-month' 7 %}">July</a>
+                    <a class="item" href="{% url 'gyara:all-month' 8 %}">August</a>
+                    <a class="item" href="{% url 'gyara:all-month' 9 %}">September</a>
+                    <a class="item" href="{% url 'gyara:all-month' 10 %}">October</a>
+                    <a class="item" href="{% url 'gyara:all-month' 11 %}">November</a>
+                    <a class="item" href="{% url 'gyara:all-month' 12 %}">December</a>
+                    <a class="item"  href="#top"><i class="arrow up icon"></i> Back to top</a>
+
+                </div>
+            </div>
+        </div>
+        <div class="ui grid">
+            <div class="twelve wide column">
+                <h1 class="table-header">All Transactions of {{ current_month }}</h1>
+
+                <table class="ui table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Flow</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if transactions %}
+                        {% for transaction in transactions %}
+                            <tr class="{% cycle 'row1' 'row2' %}">
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ transaction.description }}</td>
+                                <td align="right">{{ transaction.date|date:"D d-m" }}</td>
+                                <td>{{ transaction.category }}</td>
+                                <td>{{ transaction.get_flow_display }}</td>
+                                <td align="right">€ {{ transaction.value }}</td>
+                                <td><a href="{% url 'gyara:change-trans' transaction.pk %}"><i class="edit icon"></i>
+                                </a> <a href="{% url 'gyara:delete-trans' transaction.pk %}"><i class="delete icon"></i>
+                                </a></td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td></td>
+                            <td colspan="4">Balance</td>
+                            <td align="right">€ {{ balance }}</td>
+                            <td></td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6">Nothing to see</td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock %}
+

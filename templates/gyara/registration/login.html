@@ -1,0 +1,79 @@
+{% extends "gyara/base.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "gyara/css/login.css" %}"/>
+    {{ form.media }}
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+
+{% block content %}
+    {% block header %}
+
+    {% endblock %}
+    <div class="ui middle aligned center aligned grid">
+        <div class="column">
+            <h1 class="ui teal header image" id="site-name"><a href="{% url 'gyara:index' %}">GYARA</a></h1>
+            {% if form.errors and not form.non_field_errors %}
+                <p class="errornote">
+                    {% if form.errors.items|length == 1 %}{% trans "Please correct the error below." %}{% else %}
+                        {% trans "Please correct the errors below." %}{% endif %}
+                </p>
+            {% endif %}
+
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    <p class="errornote">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            {% endif %}
+
+
+
+            {% if user.is_authenticated %}
+                <p class="errornote">
+                    {% blocktrans trimmed %}
+                        You are authenticated as {{ username }}, but are not authorized to
+                        access this page. Would you like to login to a different account?
+                    {% endblocktrans %}
+                </p>
+            {% endif %}
+
+            <form class="ui large form" action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+                <div class="ui stacked segment">
+                    <div class="field">
+
+                        {{ form.username.errors }}
+                        <div class="ui left icon input">
+                            <i class="user icon"></i>
+                            {{ form.username }}
+                        </div>
+
+                    </div>
+                    <div class="field">
+                        {{ form.password.errors }}
+
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            {{ form.password }}
+                        </div>
+                        <input type="hidden" name="next" value="{{ next }}"/>
+                    </div>
+                    {% url 'admin_password_reset' as password_reset_url %}
+                    {% if password_reset_url %}
+                        <div class="password-reset-link">
+                            <a href="{{ password_reset_url }}">{% trans 'Forgotten your password or username?' %}</a>
+                        </div>
+                    {% endif %}
+
+                    <label>&nbsp;</label><input type="submit" class="ui fluid large teal submit button"
+                                                value="{% trans 'Log in' %}"/>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+{% endblock %}

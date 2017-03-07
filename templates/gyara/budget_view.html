@@ -1,0 +1,81 @@
+{% extends 'gyara/base.html' %}
+{% load static %}
+
+{% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="{% static 'gyara/css/forms.css' %}"/>
+{% endblock %}
+
+{% block extrascript %}
+    <script language="JavaScript">
+        $(document).ready(function () {
+            $('select').dropdown()
+        })
+    </script>
+{% endblock %}
+
+{% block title %}
+    Gyara - Category View
+{% endblock %}
+
+{% block nav-bud-view %}<a class="item active" href="{% url 'gyara:bud-view' %}">View-B</a>{% endblock %}
+
+{% block content %}
+    <div class="table-div">
+        <h1 class="table-header">Budgets</h1>
+        <table class="ui table striped">
+            <thead>
+            <tr>
+                <th>Category</th>
+                <th>Year</th>
+                <th>Reserved</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if budgets %}
+                {% for budget in budgets %}
+                    <tr class="{% cycle 'row1' 'row2' %}">
+                        <td>{{ budget.category }}</td>
+                        <td>{{ budget.year }}</td>
+
+                        <td>€ {{ budget.value }}</td>
+                        <td><a href="{% url 'gyara:change-bud' budget.pk %}"><i class="edit icon"></i> </a> <a
+                                href="{% url 'gyara:delete-bud' budget.pk %}"><i class="delete icon"></i> </a></td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="4">No budgets</td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <h1 style="margin-top: 20px">Add Budget</h1>
+    <form class="ui form" action="" method="post">{% csrf_token %}
+        {{ form.non_field_errors }}
+        {{ form.year.errors }}
+        <div class="fields">
+            <div class="two wide field"><label for="{{ form.year.id_for_label }}">Year</label></div>
+            <div class="six wide field">{{ form.year }}</div>
+        </div>
+
+
+        {{ form.category.errors }}
+        <div class="fields">
+            <div class="two wide field"><label for="{{ form.category.id_for_label }}">Category</label></div>
+            <div class="six wide field">{{ form.category }}</div>
+        </div>
+
+
+        {{ form.value.errors }}
+        <div class="fields">
+            <div class="two wide field"><label for="{{ form.value.id_for_label }}">Price:</label></div>
+            <div class="six wide field">{{ form.value }}</div>
+        </div>
+
+
+        <input class="ui button" type="submit" value="Save"/>
+    </form>
+
+{% endblock %}

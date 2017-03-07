@@ -1,0 +1,209 @@
+{% extends 'gyara/base.html' %}
+{% load static %}
+{% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="{% static 'gyara/css/forms.css' %}"/>
+{% endblock %}
+
+{% block extrascript %}
+    <script src="{% static "gyara/js/jquery-csv.js" %}"></script>
+    <script language="JavaScript">
+        function cloneMore(selector, type) {
+            var newElement = $(selector).clone(true);
+            var totalForms = $('#id_' + type + '-TOTAL_FORMS');
+            var total = totalForms.val();
+            newElement.find(':input').each(function () {
+                var name = $(this).attr('name').replace('-' + (total - 1) + '-', '-' + total + '-');
+                var id = 'id_' + name;
+                $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+            });
+            newElement.find('label').each(function () {
+                var newFor = $(this).attr('for').replace('-' + (total - 1) + '-', '-' + total + '-');
+                $(this).attr('for', newFor);
+            });
+            total++;
+            totalForms.val(total);
+            $(selector).after(newElement);
+        }
+
+        function deleteLast(selector, type) {
+            var lastElem = $(selector);
+            var totalForms = $('#id_' + type + '-TOTAL_FORMS');
+            var total = totalForms.val();
+            totalForms.val(total - 1);
+            lastElem.remove();
+        }
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function csvRowToForm(row) {
+            var lastElement = $(".cloneable:last");
+            cloneMore(".cloneable:last", "form");
+
+            lastElement.find(':input').each(function (i) {
+                if (i == 0) {
+                    $(this).val(row["Naam / Omschrijving"])
+                }
+                if (i == 1) {
+                    var day = row["Datum"].substring(6, 8);
+                    var month = row["Datum"].substring(4, 6);
+                    var year = row["Datum"].substring(0, 4);
+                    $(this).val(day + "-" + month + "-" + year)
+                }
+                if (i == 2) {
+                    if (row["Af Bij"] == "Af") {
+                        $(this).find("> option").first().removeAttr("selected");
+                        $(this).find("> option").last().prop('selected', 'selected').change();
+                        $(this).find("> option").last().attr("selected", "selected");
+                    }
+                }
+                if (i == 3) {
+                    var csrftoken = getCookie('csrftoken');
+                    var cat = $(this).find("option");
+
+
+                    $.ajax({
+                        beforeSend: function (xhr, settings) {
+                            if (!this.crossDomain) {
+                                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                            }
+                        },
+                        type: "GET",
+                        url: "{% url 'gyara:prediction' %}",
+                        data: {
+                            description: row["Naam / Omschrijving"]
+
+                        },
+                        success: function (data) {
+                            cat.each(function () {
+                                if ($(this).html() == data['prediction']) {
+                                    cat.first().removeAttr("selected");
+                                    $(this).prop('selected', 'selected').change();
+                                    $(this).attr("selected", "selected");
+                                }
+                            });
+                        },
+                        failure: function (errMsg) {
+                            console.log(errMsg);
+                        }
+
+
+                    });
+
+                }
+                if (i == 4) {
+                    $(this).val(row["Bedrag (EUR)"].replace(",", "."))
+                }
+
+            });
+
+        }
+
+
+        function upload(evt) {
+            if (!browserSupportFileUpload()) {
+                alert('The File APIs are not fully supported in this browser!');
+            } else {
+                var data = null;
+                var file = evt.target.files[0];
+                var reader = new FileReader();
+                reader.readAsText(file);
+                reader.onload = function (event) {
+                    var csvData = event.target.result;
+                    data = jQuery.csv.toObjects(csvData);
+                    if (data && data.length > 0) {
+                        for (i = 0; i < data.length; i++) {
+                            csvRowToForm(data[i]);
+                        }
+                        deleteLast(".cloneable:last", "form")
+                    } else {
+                        alert('No data to import!');
+                    }
+                };
+                reader.onerror = function () {
+                    alert('Unable to read ' + file.fileName);
+                };
+            }
+        }
+
+        function browserSupportFileUpload() {
+            var isCompatible = false;
+            if (window.File && window.FileReader && window.FileList && window.Blob) {
+                isCompatible = true;
+            }
+            return isCompatible;
+        }
+
+        $(document).ready(function () {
+            $("#add_more").click(function () {
+                cloneMore(".cloneable:last", "form");
+            });
+
+            document.getElementById('txtFileUpload').addEventListener('change', upload, false);
+
+            // Method that checks that the browser supports the HTML5 File API
+            $(".delete-row").click(function () {
+                $(this).parent().hide('slow', function () {
+                    $(this).remove()
+                });
+
+            })
+        });
+
+
+    </script>
+{% endblock %}
+
+{% block title %}
+    Gyara - Import
+{% endblock %}
+
+{% block nav-bimport %}<a class="active" href="{% url 'gyara:better-import' %}">BImport</a>{% endblock %}
+
+{% block content %}
+    <h1>Import</h1>
+    {# File input -> Javascript call for prediction -> Generate form fields -> Save data with normal POST #}
+
+    <div class="ui form">
+        <div class="field inline">
+            <label for="txtFileUpload">File</label>
+            <input type="file" name="File Upload" id="txtFileUpload" accept=".csv"/>
+        </div>
+    </div>
+
+
+    <h1 style="margin-top: 50px;">Save</h1>
+    <div class="ui row">
+        <div class="error" id=""></div>
+        <div class="fields">
+            <div class="field">
+                <input type="text" name="name"/>
+            </div>
+            <div class="field">
+
+            </div>
+            <div class="field">
+
+            </div>
+            <div class="field">
+
+            </div>
+        </div>
+
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'gyara/base.html' %}
+
+{% block title %}
+Gyara - Confirm Delete
+{% endblock %}
+
+{% block content %}
+<form action="" method="post">{% csrf_token %}
+    <p>Are you sure you want to delete "{{ object }}"?</p>
+    <input class="ui button" type="submit" value="Confirm" />
+</form>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends 'gyara/base.html' %}
+{% load static %}
+{% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="{% static 'gyara/css/forms.css' %}"/>
+{% endblock %}
+
+{% block extrascript %}
+    <script>
+        $(document).ready(function () {
+
+
+            $("#category").find("> select > option").each(function () {
+                if ($(this).html() == "{{ prediction }}") {
+
+                    $("#category").find("> select > option").first().removeAttr("selected");
+                    $(this).prop('selected', 'selected').change();
+                    $(this).attr("selected", "selected");
+
+                }
+
+            });
+
+            $('select')
+                .dropdown()
+            ;
+        });
+
+    </script>
+{% endblock %}
+
+{% block title %}
+    Gyara - {{ action }} Transaction
+{% endblock %}
+
+{% block nav-add-trans %}
+
+<a class="item {% if action == "Create" %}active{% endif %}" href="{% url 'gyara:add-trans' %}">Add-T</a>
+
+
+{% endblock %}
+
+
+{% block content %}
+    <h1>{{ action }} Transaction</h1>
+    <form class="ui form aligned" action="" method="post">{% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="field">
+                {{ form.description.errors }}
+        </div>
+        <div class="fields">
+            <div class="two wide field">
+                <label for="{{ form.description.id_for_label }}">Description</label>
+            </div>
+            <div class="six wide field">
+                {{ form.description }}
+            </div>
+        </div>
+        <div class="field">
+                {{ form.date.errors }}
+        </div>
+        <div class="fields">
+            <div class="two wide field">
+                <label for="{{ form.date.id_for_label }}">Date</label>
+            </div>
+            <div class="six wide field">
+                {{ form.date }}
+            </div>
+        </div>
+        <div class="field">
+                {{ form.flow.errors }}
+        </div>
+        <div class="fields">
+            <div class="two wide field">
+                <label for="{{ form.flow.id_for_label }}">Flow</label>
+            </div>
+            <div class="six wide field">
+                {{ form.flow }}
+            </div>
+        </div>
+        <div class="field">
+                {{ form.category.errors }}
+        </div>
+        <div class="fields">
+            <div class="two wide field">
+                <label for="{{ form.category.id_for_label }}">Category</label>
+            </div>
+            <div id="category" class="six wide field">
+                {{ form.category }}
+            </div>
+        </div>
+        <div class="field">
+                {{ form.value.errors }}
+        </div>
+        <div class="fields">
+            <div class="two wide field">
+                <label for="{{ form.value.id_for_label }}">Price</label>
+            </div>
+            <div class="six wide field">
+                {{ form.value }}
+            </div>
+        </div>
+
+        <button type="submit" class="ui button">{{ action }}</button>
+    </form>
+{% endblock %}

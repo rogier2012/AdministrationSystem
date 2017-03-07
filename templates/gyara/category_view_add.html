@@ -1,0 +1,80 @@
+{% extends 'gyara/base.html' %}
+{% load static %}
+{% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="{% static 'gyara/css/forms.css' %}"/>
+{% endblock %}
+
+{% block extrascript %}
+    <script language="JavaScript">
+        $(document).ready(function () {
+            $('select').dropdown()
+        })
+    </script>
+{% endblock %}
+
+{% block title %}
+    Gyara - Category View
+{% endblock %}
+
+{% block nav-cat-view %}<a class="item active" href="{% url 'gyara:cat-view' %}">View-C</a>{% endblock %}
+
+{% block content %}
+    <div class="table-div">
+        <h1 class="table-header">Categories</h1>
+        <table class="ui table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Flow</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if categories %}
+                {% for category in categories %}
+                    <tr class="{% cycle 'row1' 'row2' %}">
+                        <td>{{ category.name }}</td>
+                        <td>{{ category.get_flow_display }}</td>
+                        <td><a href="{% url 'gyara:change-cat' category.pk %}"><i class="edit icon"></i> </a> <a
+                                href="{% url 'gyara:delete-cat' category.pk %}"><i class="delete icon"></i> </a></td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="3">No categories</td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <h1 style="margin-top: 20px">Add Category</h1>
+    <form class="ui form" id="categoryform" action="" method="post">{% csrf_token %}
+        {{ form.non_field_errors }}
+        <div id="message"></div>
+        {{ form.name.errors }}
+        <div class="fields">
+            <div class="two wide field">
+
+                <label for="{{ form.name.id_for_label }}">Name:</label>
+            </div>
+            <div class="six wide field">
+                {{ form.name }}
+            </div>
+        </div>
+        <div class="fields">
+            {{ form.flow.errors }}
+            <div class="two wide field">
+
+                <label for="{{ form.flow.id_for_label }}">In/Out:</label>
+            </div>
+            <div class="six wide field">
+                {{ form.flow }}
+            </div>
+
+        </div>
+
+
+        <input class="ui button" type="submit" value="Save"/>
+    </form>
+
+{% endblock %}

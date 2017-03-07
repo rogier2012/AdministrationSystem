@@ -1,0 +1,120 @@
+{% extends "gyara/base.html" %}
+
+{% block title %}
+    Gyara - Dashboard
+{% endblock %}
+
+{% block extrastyle %}
+<style>
+#chartdiv{
+    width: 100%;
+    height: 500px;
+}
+
+</style>
+{% endblock %}
+
+{% block extrascript %}
+    <script src="http://www.amcharts.com/lib/3/amcharts.js"></script>
+    <script src="https://www.amcharts.com/lib/3/pie.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="ui grid ">
+        <div class="five wide column">
+            <h2 class="table-header"><i class="sign out icon"></i>Lastest In</h2>
+            <table class="ui striped table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% if lastest_out %}
+                    {% for transaction in lastest_in %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ transaction.description }}</td>
+                            <td>{{ transaction.category }}</td>
+                            <td>€{{ transaction.value }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4">No outgoing transactions</td>
+                    </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+        <div class="five wide column">
+            <h2 class="table-header"><i class="sign out icon"></i>Lastest Out</h2>
+            <table class="ui striped table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% if lastest_out %}
+                    {% for transaction in lastest_out %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ transaction.description }}</td>
+                            <td>{{ transaction.category }}</td>
+                            <td>€{{ transaction.value }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4">No outgoing transactions</td>
+                    </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+        <div class="six wide column">
+            <h2 class="table-header"><i class="tasks icon"></i> To Do List</h2>
+            <table class="ui striped small table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% if todolist %}
+                    {% for transaction in todolist %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ transaction.description }}</td>
+                            <td>{{ transaction.category }}</td>
+                            <td>€{{ transaction.value }}</td>
+                            <td><a href="{% url 'gyara:change-trans' transaction.pk %}"><i class="edit icon"></i></a><a
+                                    href="{% url 'gyara:delete-trans' transaction.pk %}"><i class="delete icon"></i>
+                            </a></td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5">Keep up the good work!</td>
+                    </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
+

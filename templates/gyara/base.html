@@ -1,0 +1,81 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+
+    <link rel="stylesheet" type="text/css" href="{% static 'gyara/css/semantic.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'gyara/css/style.css' %}" />
+    {% block extrastyle %}{% endblock %}
+    <script src="{% static 'gyara/js/jquery-3.1.1.js' %}"></script>
+    <script src="{% static 'gyara/js/semantic.js' %}"></script>
+    {% block extrascript %}
+
+    {% endblock %}
+
+
+    <title>{% block title %}Gyara Finance{% endblock %}</title>
+
+
+</head>
+<body class="{% block bodyclass %} {% endblock %}">
+    <div id="top" class="ui container">
+    {% block header %}
+        <div class="ui secondary menu">
+            <div class="item">
+                <h1 id="site-name"><a href="{% url 'gyara:index' %}">GYARA</a></h1>
+            </div>
+            {% block nav %}
+                {% if has_permission %}
+
+                {% block nav-add-trans %}<a class="item" href="{% url 'gyara:add-trans' %}">Add-T</a>{% endblock %}
+                {% block nav-out-view %}<a class="item" href="{% url 'gyara:out-view' %}">View-Out</a>{% endblock %}
+                {% block nav-in-view %}<a class="item" href="{% url 'gyara:in-view' %}">View-In</a>{% endblock %}
+                {% block nav-all-month %}<a class="item" href="{% url 'gyara:all-month' %}">View-All</a>{% endblock %}
+                {% block nav-cat-view %}<a class="item" href="{% url 'gyara:cat-view' %}">View-C</a>{% endblock %}
+                {% block nav-bud-view %}<a class="item" href="{% url 'gyara:bud-view' %}">View-B</a>{% endblock %}
+                {% block nav-import %}<a class="item" href="{% url 'gyara:import-view' %}">Import</a>{% endblock %}
+                {% block nav-bimport %}<a class="item" href="{% url 'gyara:better-import' %}">BImport</a>{% endblock %}
+
+            {% endif %}
+            {% endblock %}
+
+            {% if has_permission %}
+            {% block usertools %}
+            <div class="item">
+                {% block welcome-msg %}
+                    {% trans 'Welcome,' %}
+                    <strong>{% firstof user.get_short_name user.get_username %}</strong>.
+                {% endblock %}
+            </div>
+                {% block userlinks %}
+                    {% if user.is_active and user.is_staff %}
+                        {% url 'django-admindocs-docroot' as docsroot %}
+                        {% if docsroot %}
+                            <a class="item" href="{{ docsroot }}">{% trans 'Documentation' %}</a> /
+                        {% endif %}
+                    {% endif %}
+
+                    <a class="item" href="{% url 'gyara:logout' %}">{% trans 'Log out' %}</a>
+                {% endblock %}
+
+            {% endblock %}
+            {% endif %}
+        </div>
+    {% endblock %}
+
+        {% block pretitle %}{% endblock %}
+        {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+        {% block content %}
+        {% block object-tools %}{% endblock %}
+        {{ content }}
+        {% endblock %}
+        {% block sidebar %}{% endblock %}
+
+
+    </div>
+
+
+</body>
+</html>
