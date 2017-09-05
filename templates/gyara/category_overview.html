@@ -5,7 +5,7 @@
     <script>
         $(document).ready(function () {
             {#            $('.ui.dropdown').dropdown();#}
-            $('.ui.sticky').sticky({context: '#test'});
+            $('.ui.dropdown').dropdown();
         })
     </script>
 {% endblock %}
@@ -16,38 +16,35 @@
 
 
 {% block nav-out-view %}
-    <a class="item {% if flow == "Out" %} active {% endif %}" href="{% url 'gyara:out-view' %}">View-Out</a>
+    <a class="item {% if flow == "Out" %} active {% endif %}" href="{% url 'gyara:out-view' %}">Outgoing</a>
 {% endblock %}
 {% block nav-in-view %}
-    <a class="item {% if flow == "In" %} active {% endif %}" href="{% url 'gyara:in-view' %}">View-In</a>
+    <a class="item {% if flow == "In" %} active {% endif %}" href="{% url 'gyara:in-view' %}">Incoming</a>
+{% endblock %}
+
+
+{% block filternav %}
+    <div class="ui right aligned item">
+        <div class="ui floating dropdown labeled search icon button">
+            <i class="calendar icon"></i>
+            <span class="text">Month</span>
+            <div class="menu">
+                {% for month in months %}
+                    <a class="item" href="#{{ month }}">{{ month }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block content %}
     <div class="ui basic segment" id="test">
-        <div class="ui right  attached rail">
-            <div class="ui segment basic sticky">
-                <div class="ui selection vertical menu">
-                    {#                    <div class="text">Go to</div>#}
-                    {#                    <i class="dropdown icon"></i>#}
-                    {#                    <div class="menu">#}
-                    <div class="item active">
-                        <h4 class="ui header">Month</h4>
-                    </div>
-                    {% for month in months %}
-                        <a class="item" href="#{{ month }}">{{ month }}</a>
-                    {% endfor %}
-                    <a class="item" href="#top"><i class="arrow up icon"></i> Back to top</a>
-                    {#                    </div>#}
-
-                </div>
-            </div>
-        </div>
 
 
         <div class="ui grid">
 
             {% for month in months %}
-                <div class="eight wide column">
+                <div class="sixteen wide column">
                     <h2 id="{{ month }}">{{ month }}</h2>
                     <table class="ui table striped compact">
                         <thead>

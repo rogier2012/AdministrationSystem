@@ -29,21 +29,15 @@
             {% block nav %}
                 {% if has_permission %}
 
-                {% block nav-add-trans %}<a class="item" href="{% url 'gyara:add-trans' %}">Add-T</a>{% endblock %}
-                {% block nav-out-view %}<a class="item" href="{% url 'gyara:out-view' %}">View-Out</a>{% endblock %}
-                {% block nav-in-view %}<a class="item" href="{% url 'gyara:in-view' %}">View-In</a>{% endblock %}
-                {% block nav-all-month %}<a class="item" href="{% url 'gyara:all-month' %}">View-All</a>{% endblock %}
-                {% block nav-cat-view %}<a class="item" href="{% url 'gyara:cat-view' %}">View-C</a>{% endblock %}
-                {% block nav-bud-view %}<a class="item" href="{% url 'gyara:bud-view' %}">View-B</a>{% endblock %}
-                {% block nav-import %}<a class="item" href="{% url 'gyara:import-view' %}">Import</a>{% endblock %}
-                {% block nav-bimport %}<a class="item" href="{% url 'gyara:better-import' %}">BImport</a>{% endblock %}
+                {% block nav-transactions %}<a class="item" href="{% url 'gyara:all-month' %}">Transactions</a>{% endblock %}
+                {% block nav-bud-view %}<a class="item" href="{% url 'gyara:bud-view' %}">Budgets</a>{% endblock %}
 
             {% endif %}
             {% endblock %}
 
             {% if has_permission %}
             {% block usertools %}
-            <div class="item">
+            <div class="right aligned item">
                 {% block welcome-msg %}
                     {% trans 'Welcome,' %}
                     <strong>{% firstof user.get_short_name user.get_username %}</strong>.
@@ -63,8 +57,28 @@
             {% endblock %}
             {% endif %}
         </div>
-    {% endblock %}
+        <div class="ui secondary menu">
 
+            {% block subnav %}
+                {% if has_permission %}
+                {% if 'transactions/' in request.get_full_path %}
+                {% block nav-add-trans %}<a class="item" href="{% url 'gyara:add-trans' %}">Add</a>{% endblock %}
+                {% block nav-out-view %}<a class="item" href="{% url 'gyara:out-view' %}">Outgoing</a>{% endblock %}
+                {% block nav-in-view %}<a class="item" href="{% url 'gyara:in-view' %}">Incoming</a>{% endblock %}
+                {% block nav-all-month %}<a class="item" href="{% url 'gyara:all-month' %}">All</a>{% endblock %}
+                {% block nav-cat-view %}<a class="item" href="{% url 'gyara:cat-view' %}">Categories</a>{% endblock %}
+                 {% block nav-trans-todo %}<a class="item" href="">To Do</a>{% endblock %}
+                {% block nav-bimport %}<a class="item" href="{% url 'gyara:better-import' %}">Import</a>{% endblock %}
+                {% endif %}
+                    {% block filternav %}{% endblock %}
+            {% endif %}
+            {% endblock %}
+
+
+        </div>
+    {% endblock %}
+    </div>
+    <div class="ui container">
         {% block pretitle %}{% endblock %}
         {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
         {% block content %}

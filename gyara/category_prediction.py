@@ -14,6 +14,6 @@ def get_category_prediction(user,description):
         if desc in lowercase_description:
             cat_id = max(categories,key=categories.get)
 
-            return str(Category.objects.get(pk=cat_id))
+            return cat_id
 
     return ""

@@ -6,6 +6,7 @@ from _csv import QUOTE_NONE, QUOTE_ALL
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files import File
+from django.core.serializers import serialize
 from django.db import IntegrityError
 from django.db.models import Sum
 from django.forms import modelformset_factory
@@ -76,6 +77,7 @@ class AddTransactionView(LoginRequiredMixin, PermissionRequiredMixin, CreateView
     def form_invalid(self, form):
         response = super(AddTransactionView, self).form_invalid(form)
         if self.request.is_ajax():
+            print("JSON")
             return JsonResponse(form.errors, status=400)
         else:
             return response
@@ -258,6 +260,16 @@ class CategoryView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 
     success_url = reverse_lazy('gyara:cat-view')
 
+    def get(self, request, *args, **kwargs):
+        if self.request.is_ajax():
+            categories = Category.objects.filter(user_id=self.request.user)
+            print(categories)
+            data = serialize('json', categories)
+
+            return JsonResponse(data, safe=False)
+
+        return super(CategoryView, self).get(self, request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super(CategoryView, self).get_context_data(**kwargs)
         # Add in a QuerySet of all the books
@@ -352,35 +364,6 @@ class DeleteBudgetView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         # Add in a QuerySet of all the books
         context['has_permission'] = self.has_permission()
         return context
-
-
-class ImportView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
-    template_name = 'gyara/import.html'
-    form_class = UploadFileForm
-    success_url = reverse_lazy('gyara:import-view')
-    permission_required = 'gyara.can_upload'
-
-    def get_context_data(self, **kwargs):
-        context = super(ImportView, self).get_context_data(**kwargs)
-        context['has_permission'] = self.has_permission()
-        return context
-
-    def form_valid(self, form):
-        uploaded_file = self.request.FILES['file']
-        path = MEDIA_ROOT + "/csvu_" + uploaded_file.name
-        # Write the file to disk
-        fout = open(path, 'wb')
-        for chunk in uploaded_file.chunks():
-            fout.write(chunk)
-        fout.close()
-
-        with open(path, newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                Transaction.from_csv(self.request.user, row)
-
-        os.remove(path)
-        return super(ImportView, self).form_valid(form)
 
 
 class PredictionView(View):
